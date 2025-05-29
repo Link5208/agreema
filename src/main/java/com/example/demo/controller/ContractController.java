@@ -33,7 +33,7 @@ public class ContractController {
 
 	@PostMapping("/contracts")
 	@ApiMessage("Create a contract")
-	public ResponseEntity<Contract> createrContract(@Valid @RequestBody Contract postmanContract)
+	public ResponseEntity<Contract> createContract(@Valid @RequestBody Contract postmanContract)
 			throws IdInvalidException {
 
 		Contract currContract = this.contractService.handleFindContractById(postmanContract.getId());
@@ -60,7 +60,7 @@ public class ContractController {
 
 	@GetMapping("/contracts/{id}")
 	@ApiMessage("Get a contract by ID")
-	public ResponseEntity<Contract> getContractById(@PathVariable("id") String id) throws IdInvalidException {
+	public ResponseEntity<Contract> getContractById(@PathVariable("id") long id) throws IdInvalidException {
 		Contract currContract = this.contractService.handleFindContractById(id);
 		if (currContract == null) {
 			throw new IdInvalidException("Contract ID = " + id + " doesn't exist!");

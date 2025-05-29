@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.domain.ActionLog;
 
 @Repository
-public interface ActionLogRepository extends JpaRepository<ActionLog, String>, JpaSpecificationExecutor<ActionLog> {
+public interface ActionLogRepository extends JpaRepository<ActionLog, Long>, JpaSpecificationExecutor<ActionLog> {
 
 }

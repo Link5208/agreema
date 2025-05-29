@@ -5,6 +5,8 @@ import java.time.Instant;
 import com.example.demo.util.SecurityUtil;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -22,8 +24,11 @@ import lombok.Setter;
 @Setter
 public class Item {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+
 	@NotBlank(message = "Item-id must not blank!")
-	private String id;
+	private String itemId;
 
 	@NotBlank(message = "Item-name must not blank!")
 	private String name;
@@ -38,6 +43,7 @@ public class Item {
 	private double price;
 
 	private double total;
+	private boolean deleted;
 
 	@ManyToOne
 	@JoinColumn(name = "contract_id")

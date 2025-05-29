@@ -33,6 +33,8 @@ public class User {
 
 	@Column(columnDefinition = "MEDIUMTEXT")
 	private String refreshToken;
+
+	private boolean deleted;
 	private Instant createdAt;
 	private Instant updatedAt;
 	private String createdBy;

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.domain.Item;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, String>, JpaSpecificationExecutor<Item> {
+public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificationExecutor<Item> {
 
 }

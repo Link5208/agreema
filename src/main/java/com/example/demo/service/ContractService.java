@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 public class ContractService {
 	private final ContractRepository contractRepository;
 
-	public Contract handleFindContractById(String id) {
+	public Contract handleFindContractById(long id) {
 		Optional<Contract> optional = this.contractRepository.findById(id);
 		return optional.isPresent() ? optional.get() : null;
 	}

@@ -77,10 +77,11 @@ public class UserController {
 
 	@DeleteMapping("/users/{id}")
 	@ApiMessage("Delete an user")
-	public ResponseEntity<String> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
-		this.userService.handleDeleteUser(id);
-
-		return ResponseEntity.status(HttpStatus.OK).body("Delete Success");
+	public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
+		User fetchUser = this.userService.fetchUserById(id);
+		fetchUser.setDeleted(true);
+		this.userService.handleCreateUser(fetchUser);
+		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
 	// fetch all users

@@ -71,7 +71,7 @@ public class ItemController {
 
 	@GetMapping("/items/{id}")
 	@ApiMessage("Get an item by ID")
-	public ResponseEntity<Item> getItemById(@PathVariable("id") String id) throws IdInvalidException {
+	public ResponseEntity<Item> getItemById(@PathVariable("id") long id) throws IdInvalidException {
 		Item currItem = this.itemService.handleFetchById(id);
 		if (currItem == null) {
 			throw new IdInvalidException("Item ID = " + id + " doesn't exist!");
@@ -88,7 +88,7 @@ public class ItemController {
 
 	@DeleteMapping("/items/{id}")
 	@ApiMessage("Delete an item")
-	public ResponseEntity<Void> deleteItem(@PathVariable("id") String id) throws IdInvalidException {
+	public ResponseEntity<Void> deleteItem(@PathVariable("id") long id) throws IdInvalidException {
 		Item currItem = this.itemService.handleFetchById(id);
 		if (currItem == null) {
 			throw new IdInvalidException("Item ID = " + id + " doesn't exist!");

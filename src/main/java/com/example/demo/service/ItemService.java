@@ -22,7 +22,7 @@ public class ItemService {
 		return this.itemRepository.save(item);
 	}
 
-	public Item handleFetchById(String id) {
+	public Item handleFetchById(long id) {
 		Optional<Item> optional = this.itemRepository.findById(id);
 		return optional.isPresent() ? optional.get() : null;
 	}
@@ -44,7 +44,7 @@ public class ItemService {
 		return result;
 	}
 
-	public void handleDelete(String id) {
+	public void handleDelete(long id) {
 		this.itemRepository.deleteById(id);
 	}
 }

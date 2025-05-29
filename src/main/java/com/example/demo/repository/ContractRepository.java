@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.domain.Contract;
 
 @Repository
-public interface ContractRepository extends JpaRepository<Contract, String>, JpaSpecificationExecutor<Contract> {
+public interface ContractRepository extends JpaRepository<Contract, Long>, JpaSpecificationExecutor<Contract> {
 
 }
