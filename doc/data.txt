@@ -1,0 +1,21 @@
+"Tham khảo SQL này:
+-- Thêm dữ liệu hợp đồng
+INSERT INTO contracts (contract_id, contract_name, date) VALUES
+('HD001', 'Hợp đồng cung cấp thiết bị văn phòng', '2024-01-10 09:00:00'),
+('HD002', 'Hợp đồng mua máy chủ', '2024-01-10 09:00:00');
+
+-- Thêm hàng hóa trong hợp đồng
+INSERT INTO contract_items (item_code, item_name, unit, quantity, unit_price, total_price, contract_id) VALUES
+('VT001', 'Giấy A4', 'Ream', 100, 50.00, 5000.00, 'HD001'),
+('VT002', 'Bút bi', 'Cái', 200, 5.00, 1000.00, 'HD001'),
+('MT001', 'Máy chủ Dell R740', 'Bộ', 2, 50000.00, 100000.00, 'HD002');
+
+-- Thêm lịch sử tác động
+INSERT INTO contract_histories (history_id, contract_id, action_type, action_time, actor, details) VALUES
+('LS001', 'HD001', 'Tạo hợp đồng', '2024-01-10 09:00:00', 'Nguyen Van A', 'Khởi tạo hợp đồng mua sắm văn phòng phẩm'),
+('LS002', 'HD002', 'Phê duyệt', '2024-01-12 14:30:00', 'Tran Thi B', 'Phê duyệt mua máy chủ mới');
+
+-- Thêm file lưu trữ hợp đồng
+INSERT INTO contract_files (file_id, contract_id, file_name, file_type, file_size, file_path, uploaded_by, uploaded_at, description) VALUES
+(gen_random_uuid(), 'HD001', 'hd001_vanphong.pdf', 'pdf', 1048576, '/contracts/hd001_vanphong.pdf', 'admin', '2024-01-10 09:15:00', 'Bản scan hợp đồng văn phòng phẩm'),
+(gen_random_uuid(), 'HD002', 'hd002_maychu.pdf', 'pdf', 2097152, '/contracts/hd002_maychu.pdf', 'admin', '2024-01-12 14:45:00', 'Bản hợp đồng mua máy chủ');"
