@@ -1,13 +1,17 @@
 package com.example.demo.domain;
 
 import java.time.Instant;
+import java.util.List;
 
 import com.example.demo.util.SecurityUtil;
 import com.example.demo.util.constant.EnumStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -38,6 +42,10 @@ public class Contract {
 	private Instant updatedAt;
 	private String createdBy;
 	private String updatedBy;
+
+	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Item> items;
 
 	@PrePersist
 	public void handleBeforeCreate() {

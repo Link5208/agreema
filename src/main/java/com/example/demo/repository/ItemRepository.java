@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.domain.Contract;
+import com.example.demo.domain.Item;
 
 @Repository
-public interface ContractRepository extends JpaRepository<Contract, String>, JpaSpecificationExecutor<Contract> {
+public interface ItemRepository extends JpaRepository<Item, String>, JpaSpecificationExecutor<Item> {
 
 }
