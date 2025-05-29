@@ -7,11 +7,14 @@ import com.example.demo.domain.Contract;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.service.ContractService;
 import com.example.demo.util.annotation.ApiMessage;
+import com.example.demo.util.constant.EnumStatus;
 import com.example.demo.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
+import java.util.Date;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,10 +37,13 @@ public class ContractController {
 	@ApiMessage("Create a contract")
 	public ResponseEntity<Contract> createrContract(@Valid @RequestBody Contract postmanContract)
 			throws IdInvalidException {
+
 		Contract currContract = this.contractService.handleFindContractById(postmanContract.getId());
 		if (currContract != null) {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " already exists");
 		}
+		postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(this.contractService.handleSaveContract(postmanContract));
 	}
@@ -49,8 +55,9 @@ public class ContractController {
 		if (currContract == null) {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " doesn't exist!");
 		}
+		currContract.setStatus(postmanContract.getStatus());
 		return ResponseEntity.status(HttpStatus.OK)
-				.body(this.contractService.handleSaveContract(postmanContract));
+				.body(this.contractService.handleSaveContract(currContract));
 	}
 
 	@GetMapping("/contracts/{id}")

@@ -3,6 +3,7 @@ package com.example.demo.domain;
 import java.time.Instant;
 
 import com.example.demo.util.SecurityUtil;
+import com.example.demo.util.constant.EnumStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
@@ -30,6 +31,8 @@ public class Contract {
 	@NotNull(message = "Sign date must not be null!")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
 	private Instant signDate;
+
+	private EnumStatus status;
 
 	private Instant createdAt;
 	private Instant updatedAt;

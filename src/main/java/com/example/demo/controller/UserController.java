@@ -21,6 +21,7 @@ import com.example.demo.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -53,6 +54,16 @@ public class UserController {
 		User newUser = this.userService.handleCreateUser(postManUser);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(newUser.getEmail());
+	}
+
+	@PutMapping("/users")
+	public ResponseEntity<String> updateUser(@RequestBody User postManUser) {
+		User fetchUser = this.userService.fetchUserById(postManUser.getId());
+		fetchUser.setPassword(postManUser.getPassword());
+		this.userService.handleCreateUser(fetchUser);
+
+		return ResponseEntity.status(HttpStatus.OK).body("Update succeed!");
+
 	}
 
 	// fetch user by id
