@@ -33,7 +33,7 @@ public class Contract {
 	private String name;
 
 	@NotNull(message = "Sign date must not be null!")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Instant signDate;
 
 	private EnumStatus status;
@@ -46,6 +46,10 @@ public class Contract {
 	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Item> items;
+
+	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<ActionLog> actionLogs;
 
 	@PrePersist
 	public void handleBeforeCreate() {

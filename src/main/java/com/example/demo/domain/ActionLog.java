@@ -17,27 +17,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Items")
+@Table(name = "action_logs")
 @Getter
 @Setter
-public class Item {
+public class ActionLog {
 	@Id
-	@NotBlank(message = "Item-id must not blank!")
+	@NotBlank(message = "Action log ID must not blank!")
 	private String id;
-
-	@NotBlank(message = "Item-name must not blank!")
-	private String name;
-
-	@NotBlank(message = "Unit must not blank!")
-	private String unit;
-
-	@NotNull(message = "Quantity must not blank!")
-	private long quantity;
-
-	@NotNull(message = "Unit price must not blank!")
-	private double price;
-
-	private double total;
 
 	@ManyToOne
 	@JoinColumn(name = "contract_id")
