@@ -65,6 +65,7 @@ public class AuthController {
 
 		String hashPassword = this.passwordEncoder.encode(postmanUser.getPassword());
 		postmanUser.setPassword(hashPassword);
+		postmanUser.setDeleted(false);
 
 		User newUser = this.userService.handleCreateUser(postmanUser);
 

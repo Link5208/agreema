@@ -43,6 +43,7 @@ public class ItemController {
 		}
 
 		postmanItem.setTotal(postmanItem.getQuantity() * postmanItem.getPrice());
+		postmanItem.setDeleted(false);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(this.itemService.handleSaveItem(postmanItem));
@@ -93,7 +94,8 @@ public class ItemController {
 		if (currItem == null) {
 			throw new IdInvalidException("Item ID = " + id + " doesn't exist!");
 		}
-		this.itemService.handleDelete(id);
+		currItem.setDeleted(true);
+		this.itemService.handleSaveItem(currItem);
 		return ResponseEntity.ok(null);
 	}
 

@@ -1,0 +1,4 @@
+1. controller ko viết code
+2. service là interface, serviceImpl implements Service
+3. Chỉnh lại SpringFilter
+4. Sửa message cho exception

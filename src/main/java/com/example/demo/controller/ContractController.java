@@ -41,6 +41,7 @@ public class ContractController {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " already exists");
 		}
 		postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
+		postmanContract.setDeleted(false);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(this.contractService.handleSaveContract(postmanContract));

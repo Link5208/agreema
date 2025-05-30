@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -32,7 +34,9 @@ public class ActionLogService {
 
 		result.setMeta(meta);
 
-		result.setResult(page.getContent());
+		List<ActionLog> list = page.getContent().stream().filter(actionLog -> !actionLog.isDeleted()).toList();
+
+		result.setResult(list);
 
 		return result;
 	}

@@ -50,6 +50,7 @@ public class UserController {
 
 		String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
 		postManUser.setPassword(hashPassword);
+		postManUser.setDeleted(false);
 
 		User newUser = this.userService.handleCreateUser(postManUser);
 

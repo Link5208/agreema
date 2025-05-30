@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -56,8 +57,9 @@ public class UserService {
 		meta.setTotal(page.getTotalElements());
 
 		result.setMeta(meta);
+		List<User> list = page.getContent().stream().filter(user -> !user.isDeleted()).toList();
 
-		result.setResult(page.getContent());
+		result.setResult(list);
 
 		return result;
 	}

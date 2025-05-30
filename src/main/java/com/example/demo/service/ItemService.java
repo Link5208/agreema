@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -39,7 +40,9 @@ public class ItemService {
 
 		result.setMeta(meta);
 
-		result.setResult(page.getContent());
+		List<Item> list = page.getContent().stream().filter(item -> !item.isDeleted()).toList();
+
+		result.setResult(list);
 
 		return result;
 	}
