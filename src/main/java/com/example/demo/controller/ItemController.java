@@ -63,7 +63,7 @@ public class ItemController {
 		postmanItem.setTotal(postmanItem.getQuantity() * postmanItem.getPrice());
 
 		if (postmanItem.getContract() != null) {
-			Contract currContract = this.contractService.handleFindContractById(postmanItem.getContract().getId());
+			Contract currContract = this.contractService.findContractById(postmanItem.getContract().getId());
 			currItem.setContract(currContract);
 		}
 		return ResponseEntity.status(HttpStatus.OK)

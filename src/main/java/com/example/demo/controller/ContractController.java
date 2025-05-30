@@ -7,7 +7,6 @@ import com.example.demo.domain.Contract;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.service.ContractService;
 import com.example.demo.util.annotation.ApiMessage;
-import com.example.demo.util.constant.EnumStatus;
 import com.example.demo.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
 
@@ -36,37 +35,23 @@ public class ContractController {
 	public ResponseEntity<Contract> createContract(@Valid @RequestBody Contract postmanContract)
 			throws IdInvalidException {
 
-		Contract currContract = this.contractService.handleFindContractById(postmanContract.getId());
-		if (currContract != null) {
-			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " already exists");
-		}
-		postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
-		postmanContract.setDeleted(false);
-
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(this.contractService.handleSaveContract(postmanContract));
+				.body(this.contractService.handleCreateContract(postmanContract));
 	}
 
 	@PutMapping("/contracts")
 	@ApiMessage("Update a contract")
 	public ResponseEntity<Contract> updateContract(@RequestBody Contract postmanContract) throws IdInvalidException {
-		Contract currContract = this.contractService.handleFindContractById(postmanContract.getId());
-		if (currContract == null) {
-			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " doesn't exist!");
-		}
-		currContract.setStatus(postmanContract.getStatus());
+
 		return ResponseEntity.status(HttpStatus.OK)
-				.body(this.contractService.handleSaveContract(currContract));
+				.body(this.contractService.handleUpdateContract(postmanContract));
 	}
 
 	@GetMapping("/contracts/{id}")
 	@ApiMessage("Get a contract by ID")
 	public ResponseEntity<Contract> getContractById(@PathVariable("id") long id) throws IdInvalidException {
-		Contract currContract = this.contractService.handleFindContractById(id);
-		if (currContract == null) {
-			throw new IdInvalidException("Contract ID = " + id + " doesn't exist!");
-		}
-		return ResponseEntity.ok(currContract);
+
+		return ResponseEntity.ok(this.contractService.handleGetContractById(id));
 	}
 
 	@GetMapping("/contracts")
