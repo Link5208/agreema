@@ -15,6 +15,7 @@ import com.example.demo.domain.response.ResLoginDTO;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import com.example.demo.service.criteria.UserSpecs;
 import com.example.demo.util.SecurityUtil;
 import com.example.demo.util.error.IdInvalidException;
 
@@ -59,7 +60,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	public ResultPaginationDTO fetchAllUser(Specification<User> specification, Pageable pageable) {
-		Page<User> page = this.userRepository.findAllByDeletedFalse(specification, pageable);
+		Specification<User> finalSpec = Specification.where(UserSpecs.matchDeletedFalse());
+		if (specification != null) {
+			finalSpec = finalSpec.and(specification);
+		}
+		Page<User> page = this.userRepository.findAll(finalSpec, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 

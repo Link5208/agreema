@@ -32,7 +32,7 @@ public class OpenAPIConfig {
 		return new Info()
 				.title("Agreema API")
 				.version("1.0")
-				.description("This API exposes all endpoints (job hunter)");
+				.description("This API exposes all endpoints (Agreema)");
 	}
 
 	@Bean
