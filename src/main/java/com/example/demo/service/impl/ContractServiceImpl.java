@@ -67,7 +67,7 @@ public class ContractServiceImpl implements ContractService {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " doesn't exist!");
 		}
 		if (currContract.getStatus() != postmanContract.getStatus()) {
-			this.actionLogService.handleCreateActionLog(postmanContract, EnumTypeLog.CHANGE_CONTRACT_STATUS);
+			this.actionLogService.handleCreateActionLog(postmanContract, EnumTypeLog.CHANGE_CONTRACT);
 			currContract.setStatus(postmanContract.getStatus());
 		}
 

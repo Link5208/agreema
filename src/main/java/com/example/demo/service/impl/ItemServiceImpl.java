@@ -11,8 +11,10 @@ import com.example.demo.domain.Contract;
 import com.example.demo.domain.Item;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ItemRepository;
+import com.example.demo.service.ActionLogService;
 import com.example.demo.service.ContractService;
 import com.example.demo.service.ItemService;
+import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
 
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ import lombok.AllArgsConstructor;
 public class ItemServiceImpl implements ItemService {
 	private final ItemRepository itemRepository;
 	private final ContractService contractService;
+	private final ActionLogService actionLogService;
 
 	public Item handleSaveItem(Item item) {
 		return this.itemRepository.save(item);
@@ -58,6 +61,7 @@ public class ItemServiceImpl implements ItemService {
 			throw new IdInvalidException("Item ID = " + id + " doesn't exist!");
 		}
 		currItem.setDeleted(true);
+		this.actionLogService.handleCreateActionLog(currItem.getContract(), EnumTypeLog.CHANGE_CONTRACT);
 		handleSaveItem(currItem);
 	}
 
@@ -69,6 +73,10 @@ public class ItemServiceImpl implements ItemService {
 
 		postmanItem.setTotal(postmanItem.getQuantity() * postmanItem.getPrice());
 		postmanItem.setDeleted(false);
+		Contract contract = this.contractService.findContractById(postmanItem.getId());
+		postmanItem.setContract(contract);
+		this.actionLogService.handleCreateActionLog(postmanItem.getContract(), EnumTypeLog.CHANGE_CONTRACT);
+
 		return handleSaveItem(postmanItem);
 	}
 
@@ -81,12 +89,14 @@ public class ItemServiceImpl implements ItemService {
 		currItem.setUnit(postmanItem.getUnit());
 		currItem.setQuantity(postmanItem.getQuantity());
 		currItem.setPrice(postmanItem.getPrice());
-		postmanItem.setTotal(postmanItem.getQuantity() * postmanItem.getPrice());
+		currItem.setTotal(currItem.getQuantity() * currItem.getPrice());
 
 		if (postmanItem.getContract() != null) {
 			Contract currContract = this.contractService.findContractById(postmanItem.getContract().getId());
 			currItem.setContract(currContract);
 		}
+		this.actionLogService.handleCreateActionLog(currItem.getContract(), EnumTypeLog.CHANGE_CONTRACT);
+
 		return handleSaveItem(currItem);
 	}
 
