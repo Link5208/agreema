@@ -3,6 +3,7 @@ package com.example.demo.domain;
 import java.time.Instant;
 
 import com.example.demo.util.SecurityUtil;
+import com.example.demo.util.constant.EnumTypeLog;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,18 +17,19 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "action_logs")
 @Getter
 @Setter
+@NoArgsConstructor
 public class ActionLog {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@NotBlank(message = "Action log ID must not blank!")
 	private String actionLogId;
 
 	@ManyToOne
@@ -35,7 +37,23 @@ public class ActionLog {
 	@NotNull(message = "Contract_id must not blank!")
 	private Contract contract;
 
+	private EnumTypeLog type;
+
 	private boolean deleted;
+
+	/**
+	 * @param actionLogId
+	 * @param contract
+	 * @param type
+	 * @param deleted
+	 */
+	public ActionLog(String actionLogId, @NotNull(message = "Contract_id must not blank!") Contract contract,
+			EnumTypeLog type, boolean deleted) {
+		this.actionLogId = actionLogId;
+		this.contract = contract;
+		this.type = type;
+		this.deleted = deleted;
+	}
 
 	private Instant createdAt;
 	private Instant updatedAt;

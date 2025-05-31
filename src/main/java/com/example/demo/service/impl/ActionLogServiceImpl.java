@@ -6,9 +6,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.ActionLog;
+import com.example.demo.domain.Contract;
+import com.example.demo.domain.Counter;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ActionLogRepository;
 import com.example.demo.service.ActionLogService;
+import com.example.demo.util.constant.EnumTypeLog;
 
 import lombok.AllArgsConstructor;
 
@@ -36,5 +39,12 @@ public class ActionLogServiceImpl implements ActionLogService {
 		result.setResult(page.getContent());
 
 		return result;
+	}
+
+	public ActionLog handleCreateActionLog(Contract contract, EnumTypeLog type) {
+		long id = Counter.getAndIncrement();
+		String formattedId = String.format("%03d", id);
+		String actionLogId = "AL" + formattedId;
+		return handleSaveActionLog(new ActionLog(actionLogId, contract, type, false));
 	}
 }

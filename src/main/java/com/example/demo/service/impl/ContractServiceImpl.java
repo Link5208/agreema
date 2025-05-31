@@ -8,10 +8,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.Contract;
+import com.example.demo.domain.Counter;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ContractRepository;
+import com.example.demo.service.ActionLogService;
 import com.example.demo.service.ContractService;
 import com.example.demo.util.constant.EnumStatus;
+import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +23,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ContractServiceImpl implements ContractService {
 	private final ContractRepository contractRepository;
+	private final ActionLogService actionLogService;
 
 	public Contract findContractById(long id) {
 		Optional<Contract> optional = this.contractRepository.findById(id);
@@ -54,6 +58,7 @@ public class ContractServiceImpl implements ContractService {
 		}
 		postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
 		postmanContract.setDeleted(false);
+		this.actionLogService.handleCreateActionLog(postmanContract, EnumTypeLog.CREATE_CONTRACT);
 		return handleSaveContract(postmanContract);
 	}
 
@@ -62,7 +67,11 @@ public class ContractServiceImpl implements ContractService {
 		if (currContract == null) {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " doesn't exist!");
 		}
-		currContract.setStatus(postmanContract.getStatus());
+		if (currContract.getStatus() != postmanContract.getStatus()) {
+			this.actionLogService.handleCreateActionLog(postmanContract, EnumTypeLog.CHANGE_CONTRACT_STATUS);
+			currContract.setStatus(postmanContract.getStatus());
+		}
+
 		return handleSaveContract(currContract);
 	}
 
