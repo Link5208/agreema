@@ -53,7 +53,7 @@ public class AuthController {
 
 	@PostMapping("/auth/register")
 	@ApiMessage("Register a new user")
-	public ResponseEntity<String> register(@Valid @RequestBody User postmanUser) throws IdInvalidException {
+	public ResponseEntity<User> register(@Valid @RequestBody User postmanUser) throws IdInvalidException {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.handleCreateUser(postmanUser));
 	}

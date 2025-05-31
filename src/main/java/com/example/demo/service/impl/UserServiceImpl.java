@@ -29,10 +29,9 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	public User handleSaveUser(User user) {
-		if (!this.userRepository.existsByEmail(user.getEmail())) {
-			return this.userRepository.save(user);
-		}
-		return null;
+
+		return this.userRepository.save(user);
+
 	}
 
 	// public void handleDeleteUser(long id) {
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	public ResultPaginationDTO fetchAllUser(Specification<User> specification, Pageable pageable) {
-		Specification<User> finalSpec = Specification.where(UserSpecs.matchDeletedFalse());
+		Specification<User> finalSpec = UserSpecs.matchDeletedFalse();
 		if (specification != null) {
 			finalSpec = finalSpec.and(specification);
 		}
@@ -96,7 +95,7 @@ public class UserServiceImpl implements UserService {
 		return this.userRepository.findByRefreshTokenAndEmail(token, email);
 	}
 
-	public String handleCreateUser(User postmanUser) throws IdInvalidException {
+	public User handleCreateUser(User postmanUser) throws IdInvalidException {
 		boolean isEmailExist = isEmailExist(postmanUser.getEmail());
 		if (isEmailExist) {
 			throw new IdInvalidException("Email " + postmanUser.getEmail() + " existed!!!");
@@ -106,15 +105,14 @@ public class UserServiceImpl implements UserService {
 		postmanUser.setPassword(hashPassword);
 		postmanUser.setDeleted(false);
 
-		User newUser = handleSaveUser(postmanUser);
-		return newUser.getEmail();
+		return handleSaveUser(postmanUser);
 	}
 
-	public String handleUpdateUser(User postmanUser) {
+	public User handleUpdateUser(User postmanUser) {
 		User fetchUser = fetchUserById(postmanUser.getId());
 		fetchUser.setPassword(postmanUser.getPassword());
 		handleSaveUser(fetchUser);
-		return fetchUser.getEmail();
+		return fetchUser;
 	}
 
 	public ResLoginDTO.UserGetAccount handleGetAccount() {

@@ -14,6 +14,7 @@ import com.example.demo.repository.ItemRepository;
 import com.example.demo.service.ActionLogService;
 import com.example.demo.service.ContractService;
 import com.example.demo.service.ItemService;
+import com.example.demo.service.criteria.ItemSpecs;
 import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
 
@@ -36,7 +37,11 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	public ResultPaginationDTO handleFetchAllItems(Specification<Item> specification, Pageable pageable) {
-		Page<Item> page = this.itemRepository.findAllByDeletedFalse(specification, pageable);
+		Specification<Item> finalSpec = ItemSpecs.matchDeletedFalse();
+		if (specification != null) {
+			finalSpec = finalSpec.and(specification);
+		}
+		Page<Item> page = this.itemRepository.findAllByDeletedFalse(finalSpec, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 

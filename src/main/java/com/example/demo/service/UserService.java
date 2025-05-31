@@ -25,9 +25,9 @@ public interface UserService {
 
 	public User getUserByRefreshTokenAndEmail(String token, String email);
 
-	public String handleCreateUser(User postmanUser) throws IdInvalidException;
+	public User handleCreateUser(User postmanUser) throws IdInvalidException;
 
-	public String handleUpdateUser(User postmanUser);
+	public User handleUpdateUser(User postmanUser);
 
 	public ResLoginDTO.UserGetAccount handleGetAccount();
 }

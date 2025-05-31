@@ -8,6 +8,7 @@ import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 
 @Configuration
 public class DateTimeFormatConfiguration implements WebMvcConfigurer {
@@ -15,9 +16,11 @@ public class DateTimeFormatConfiguration implements WebMvcConfigurer {
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	@Bean
-	public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
+	public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
 		return builder -> {
+			builder.timeZone(TimeZone.getDefault());
 			builder.simpleDateFormat(DATE_TIME_FORMAT);
+
 		};
 	}
 

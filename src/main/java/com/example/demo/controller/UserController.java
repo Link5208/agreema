@@ -32,14 +32,14 @@ public class UserController {
 
 	@PostMapping("/users")
 	@ApiMessage("Create a new user")
-	public ResponseEntity<String> createNewUser(@Valid @RequestBody User postManUser)
+	public ResponseEntity<User> createNewUser(@Valid @RequestBody User postManUser)
 			throws IdInvalidException {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.handleCreateUser(postManUser));
 	}
 
 	@PutMapping("/users")
-	public ResponseEntity<String> updateUser(@RequestBody User postManUser) {
+	public ResponseEntity<User> updateUser(@RequestBody User postManUser) {
 
 		return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleUpdateUser(postManUser));
 
@@ -48,9 +48,9 @@ public class UserController {
 	// fetch user by id
 	@GetMapping("/users/{id}")
 	@ApiMessage("Fetch user by id")
-	public ResponseEntity<String> getUserById(@PathVariable("id") long id) throws IdInvalidException {
+	public ResponseEntity<User> getUserById(@PathVariable("id") long id) throws IdInvalidException {
 
-		return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchUserById(id).getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchUserById(id));
 	}
 
 	@DeleteMapping("/users/{id}")

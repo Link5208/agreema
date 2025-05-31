@@ -12,6 +12,7 @@ import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ContractRepository;
 import com.example.demo.service.ActionLogService;
 import com.example.demo.service.ContractService;
+import com.example.demo.service.criteria.ContractSpecs;
 import com.example.demo.util.constant.EnumStatus;
 import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
@@ -34,7 +35,11 @@ public class ContractServiceImpl implements ContractService {
 	}
 
 	public ResultPaginationDTO handleFetchAllContracts(Specification<Contract> specification, Pageable pageable) {
-		Page<Contract> page = this.contractRepository.findAllByDeletedFalse(specification, pageable);
+		Specification<Contract> finalSpec = ContractSpecs.matchDeletedFalse();
+		if (specification != null) {
+			finalSpec = finalSpec.and(specification);
+		}
+		Page<Contract> page = this.contractRepository.findAllByDeletedFalse(finalSpec, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 

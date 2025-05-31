@@ -17,7 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
 	User findByRefreshTokenAndEmail(String refreshToken, String email);
 
-	// @Query("select u from User u where u.deleted = 0")
 	Page<User> findAll(Specification<User> specification, Pageable pageable);
 
 }
