@@ -21,49 +21,28 @@ import com.example.demo.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/v1")
+@AllArgsConstructor
 public class UserController {
 	private final UserService userService;
-	private final PasswordEncoder passwordEncoder;
-
-	/**
-	 * @param userService
-	 * @param passwordEncoder
-	 */
-	public UserController(UserService userService, PasswordEncoder passwordEncoder) {
-		this.userService = userService;
-		this.passwordEncoder = passwordEncoder;
-	}
 
 	@PostMapping("/users")
 	@ApiMessage("Create a new user")
 	public ResponseEntity<String> createNewUser(@Valid @RequestBody User postManUser)
 			throws IdInvalidException {
 
-		boolean isEmailExist = this.userService.isEmailExist(postManUser.getEmail());
-		if (isEmailExist) {
-			throw new IdInvalidException("Email " + postManUser.getEmail() + " existed!!!");
-		}
-
-		String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
-		postManUser.setPassword(hashPassword);
-		postManUser.setDeleted(false);
-
-		User newUser = this.userService.handleCreateUser(postManUser);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(newUser.getEmail());
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.handleCreateUser(postManUser));
 	}
 
 	@PutMapping("/users")
 	public ResponseEntity<String> updateUser(@RequestBody User postManUser) {
-		User fetchUser = this.userService.fetchUserById(postManUser.getId());
-		fetchUser.setPassword(postManUser.getPassword());
-		this.userService.handleCreateUser(fetchUser);
 
-		return ResponseEntity.status(HttpStatus.OK).body("Update succeed!");
+		return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleUpdateUser(postManUser));
 
 	}
 
@@ -71,17 +50,14 @@ public class UserController {
 	@GetMapping("/users/{id}")
 	@ApiMessage("Fetch user by id")
 	public ResponseEntity<String> getUserById(@PathVariable("id") long id) throws IdInvalidException {
-		User fetchUser = this.userService.fetchUserById(id);
 
-		return ResponseEntity.status(HttpStatus.OK).body(fetchUser.getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchUserById(id).getEmail());
 	}
 
 	@DeleteMapping("/users/{id}")
 	@ApiMessage("Delete an user")
 	public ResponseEntity<Void> deleteUser(@PathVariable("id") long id) throws IdInvalidException {
-		User fetchUser = this.userService.fetchUserById(id);
-		fetchUser.setDeleted(true);
-		this.userService.handleCreateUser(fetchUser);
+		this.userService.handleDeleteUser(id);
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 

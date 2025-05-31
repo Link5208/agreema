@@ -35,20 +35,17 @@ public class AuthController {
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final SecurityUtil securityUtil;
 	private final UserService userService;
-	private final PasswordEncoder passwordEncoder;
 
 	/**
 	 * @param authenticationManagerBuilder
 	 * @param securityUtil
 	 * @param userService
-	 * @param passwordEncoder
 	 */
 	public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
 			UserService userService, PasswordEncoder passwordEncoder) {
 		this.authenticationManagerBuilder = authenticationManagerBuilder;
 		this.securityUtil = securityUtil;
 		this.userService = userService;
-		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Value("${hoanglong.jwt.refresh-token-validity-in-seconds}")
@@ -58,18 +55,7 @@ public class AuthController {
 	@ApiMessage("Register a new user")
 	public ResponseEntity<String> register(@Valid @RequestBody User postmanUser) throws IdInvalidException {
 
-		boolean isEmailExist = this.userService.isEmailExist(postmanUser.getEmail());
-		if (isEmailExist) {
-			throw new IdInvalidException("Email " + postmanUser.getEmail() + " existed!!!");
-		}
-
-		String hashPassword = this.passwordEncoder.encode(postmanUser.getPassword());
-		postmanUser.setPassword(hashPassword);
-		postmanUser.setDeleted(false);
-
-		User newUser = this.userService.handleCreateUser(postmanUser);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(newUser.getEmail());
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.handleCreateUser(postmanUser));
 	}
 
 	@PostMapping("/auth/login")
@@ -114,21 +100,8 @@ public class AuthController {
 	@GetMapping("/auth/account")
 	@ApiMessage("Fetch account")
 	public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {
-		String email = SecurityUtil.getCurrentUserLogin().isPresent()
-				? SecurityUtil.getCurrentUserLogin().get()
-				: "";
 
-		User currentUserDB = this.userService.handleGetUserByUsername(email);
-
-		ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin();
-		ResLoginDTO.UserGetAccount userGetAccount = new ResLoginDTO.UserGetAccount();
-		if (currentUserDB != null) {
-			userLogin.setId(currentUserDB.getId());
-			userLogin.setEmail(currentUserDB.getEmail());
-
-			userGetAccount.setUser(userLogin);
-		}
-		return ResponseEntity.ok().body(userGetAccount);
+		return ResponseEntity.ok().body(this.userService.handleGetAccount());
 	}
 
 	@GetMapping("/auth/refresh")

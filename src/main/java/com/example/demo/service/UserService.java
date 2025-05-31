@@ -4,10 +4,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.example.demo.domain.User;
+import com.example.demo.domain.response.ResLoginDTO;
 import com.example.demo.domain.response.ResultPaginationDTO;
+import com.example.demo.util.error.IdInvalidException;
 
 public interface UserService {
-	public User handleCreateUser(User user);
+	public User handleSaveUser(User user);
 
 	public void handleDeleteUser(long id);
 
@@ -22,4 +24,10 @@ public interface UserService {
 	public void updateUserToken(String token, String email);
 
 	public User getUserByRefreshTokenAndEmail(String token, String email);
+
+	public String handleCreateUser(User postmanUser) throws IdInvalidException;
+
+	public String handleUpdateUser(User postmanUser);
+
+	public ResLoginDTO.UserGetAccount handleGetAccount();
 }
