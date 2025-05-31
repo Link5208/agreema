@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -32,7 +31,7 @@ public class ContractServiceImpl implements ContractService {
 	}
 
 	public ResultPaginationDTO handleFetchAllContracts(Specification<Contract> specification, Pageable pageable) {
-		Page<Contract> page = this.contractRepository.findAll(specification, pageable);
+		Page<Contract> page = this.contractRepository.findAllByDeletedFalse(specification, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
@@ -43,9 +42,7 @@ public class ContractServiceImpl implements ContractService {
 
 		result.setMeta(meta);
 
-		List<Contract> list = page.getContent().stream().filter(contract -> !contract.isDeleted()).toList();
-
-		result.setResult(list);
+		result.setResult(page.getContent());
 
 		return result;
 	}

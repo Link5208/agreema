@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -30,7 +29,7 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	public ResultPaginationDTO handleFetchAllItems(Specification<Item> specification, Pageable pageable) {
-		Page<Item> page = this.itemRepository.findAll(specification, pageable);
+		Page<Item> page = this.itemRepository.findAllByDeletedFalse(specification, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
@@ -41,9 +40,7 @@ public class ItemServiceImpl implements ItemService {
 
 		result.setMeta(meta);
 
-		List<Item> list = page.getContent().stream().filter(item -> !item.isDeleted()).toList();
-
-		result.setResult(list);
+		result.setResult(page.getContent());
 
 		return result;
 	}

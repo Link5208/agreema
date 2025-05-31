@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -11,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.User;
-import com.example.demo.domain.request.ReqLoginDTO;
+
 import com.example.demo.domain.response.ResLoginDTO;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.UserRepository;
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	public ResultPaginationDTO fetchAllUser(Specification<User> specification, Pageable pageable) {
-		Page<User> page = this.userRepository.findAll(specification, pageable);
+		Page<User> page = this.userRepository.findAllByDeletedFalse(specification, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
@@ -70,9 +69,8 @@ public class UserServiceImpl implements UserService {
 		meta.setTotal(page.getTotalElements());
 
 		result.setMeta(meta);
-		List<User> list = page.getContent().stream().filter(user -> !user.isDeleted()).toList();
 
-		result.setResult(list);
+		result.setResult(page.getContent());
 
 		return result;
 	}

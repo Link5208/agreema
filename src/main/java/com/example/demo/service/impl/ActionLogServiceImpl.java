@@ -1,7 +1,5 @@
 package com.example.demo.service.impl;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,7 +22,7 @@ public class ActionLogServiceImpl implements ActionLogService {
 	}
 
 	public ResultPaginationDTO handleFetchAllActionLogs(Specification<ActionLog> specification, Pageable pageable) {
-		Page<ActionLog> page = this.actionLogRepository.findAll(specification, pageable);
+		Page<ActionLog> page = this.actionLogRepository.findAllByDeletedFalse(specification, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
@@ -35,9 +33,7 @@ public class ActionLogServiceImpl implements ActionLogService {
 
 		result.setMeta(meta);
 
-		List<ActionLog> list = page.getContent().stream().filter(actionLog -> !actionLog.isDeleted()).toList();
-
-		result.setResult(list);
+		result.setResult(page.getContent());
 
 		return result;
 	}
