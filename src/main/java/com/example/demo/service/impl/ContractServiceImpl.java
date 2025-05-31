@@ -8,7 +8,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.Contract;
-import com.example.demo.domain.Counter;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ContractRepository;
 import com.example.demo.service.ActionLogService;
@@ -81,5 +80,15 @@ public class ContractServiceImpl implements ContractService {
 			throw new IdInvalidException("Contract ID = " + id + " doesn't exist!");
 		}
 		return currContract;
+	}
+
+	public void handleDelete(long id) throws IdInvalidException {
+		Contract currContract = findContractById(id);
+		if (currContract == null) {
+			throw new IdInvalidException("Contract ID = " + id + " doesn't exist!");
+		}
+		currContract.setDeleted(true);
+		handleSaveContract(currContract);
+		this.actionLogService.handleCreateActionLog(currContract, EnumTypeLog.DELETE_CONTRACT);
 	}
 }

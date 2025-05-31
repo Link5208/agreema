@@ -19,4 +19,6 @@ public interface ContractService {
 	public Contract handleUpdateContract(Contract postmanContract) throws IdInvalidException;
 
 	public Contract handleGetContractById(long id) throws IdInvalidException;
+
+	public void handleDelete(long id) throws IdInvalidException;
 }
