@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -11,6 +13,8 @@ public interface ItemService {
 	public Item handleSaveItem(Item item);
 
 	public Item fetchById(long id);
+
+	public List<Item> fetchByItemId(String itemId);
 
 	public ResultPaginationDTO handleFetchAllItems(Specification<Item> specification, Pageable pageable);
 

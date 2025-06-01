@@ -38,7 +38,7 @@ public class Contract {
 	private String name;
 
 	@NotNull(message = "Sign date must not be null!")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
 	private Instant signDate;
 
 	private EnumStatus status;

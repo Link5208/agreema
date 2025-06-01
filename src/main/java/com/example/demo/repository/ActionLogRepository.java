@@ -11,5 +11,5 @@ import com.example.demo.domain.ActionLog;
 
 @Repository
 public interface ActionLogRepository extends JpaRepository<ActionLog, Long>, JpaSpecificationExecutor<ActionLog> {
-	Page<ActionLog> findAllByDeletedFalse(Specification<ActionLog> specification, Pageable pageable);
+	Page<ActionLog> findAll(Specification<ActionLog> specification, Pageable pageable);
 }

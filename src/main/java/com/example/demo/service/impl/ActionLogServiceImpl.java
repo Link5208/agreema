@@ -30,7 +30,7 @@ public class ActionLogServiceImpl implements ActionLogService {
 		if (specification != null) {
 			finalSpec = finalSpec.and(specification);
 		}
-		Page<ActionLog> page = this.actionLogRepository.findAllByDeletedFalse(finalSpec, pageable);
+		Page<ActionLog> page = this.actionLogRepository.findAll(finalSpec, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 

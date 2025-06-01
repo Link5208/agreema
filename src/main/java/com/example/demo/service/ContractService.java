@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -11,6 +13,8 @@ public interface ContractService {
 	public Contract findContractById(long id);
 
 	public Contract handleSaveContract(Contract contract);
+
+	public List<Contract> findContractByContractId(String contractId);
 
 	public ResultPaginationDTO handleFetchAllContracts(Specification<Contract> specification, Pageable pageable);
 

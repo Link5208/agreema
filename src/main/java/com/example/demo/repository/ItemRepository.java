@@ -1,5 +1,7 @@
 package com.example.demo.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,5 +13,7 @@ import com.example.demo.domain.Item;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificationExecutor<Item> {
-	Page<Item> findAllByDeletedFalse(Specification<Item> specification, Pageable pageable);
+	Page<Item> findAll(Specification<Item> specification, Pageable pageable);
+
+	List<Item> findByItemId(String itemId);
 }

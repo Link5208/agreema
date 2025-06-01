@@ -1,5 +1,7 @@
 package com.example.demo.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,5 +13,7 @@ import com.example.demo.domain.Contract;
 
 @Repository
 public interface ContractRepository extends JpaRepository<Contract, Long>, JpaSpecificationExecutor<Contract> {
-	Page<Contract> findAllByDeletedFalse(Specification<Contract> specification, Pageable pageable);
+	Page<Contract> findAll(Specification<Contract> specification, Pageable pageable);
+
+	List<Contract> findByContractId(String contractId);
 }

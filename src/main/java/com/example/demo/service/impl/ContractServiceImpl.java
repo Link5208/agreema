@@ -1,7 +1,9 @@
 package com.example.demo.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,6 +14,7 @@ import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ContractRepository;
 import com.example.demo.service.ActionLogService;
 import com.example.demo.service.ContractService;
+import com.example.demo.service.ItemService;
 import com.example.demo.service.criteria.ContractSpecs;
 import com.example.demo.util.constant.EnumStatus;
 import com.example.demo.util.constant.EnumTypeLog;
@@ -24,6 +27,7 @@ import lombok.AllArgsConstructor;
 public class ContractServiceImpl implements ContractService {
 	private final ContractRepository contractRepository;
 	private final ActionLogService actionLogService;
+	private final ItemService itemService;
 
 	public Contract findContractById(long id) {
 		Optional<Contract> optional = this.contractRepository.findById(id);
@@ -34,12 +38,17 @@ public class ContractServiceImpl implements ContractService {
 		return this.contractRepository.save(contract);
 	}
 
+	public List<Contract> findContractByContractId(String contractId) {
+		List<Contract> contracts = this.contractRepository.findByContractId(contractId);
+		return contracts.stream().filter(contract -> !contract.isDeleted()).toList();
+	}
+
 	public ResultPaginationDTO handleFetchAllContracts(Specification<Contract> specification, Pageable pageable) {
 		Specification<Contract> finalSpec = ContractSpecs.matchDeletedFalse();
 		if (specification != null) {
 			finalSpec = finalSpec.and(specification);
 		}
-		Page<Contract> page = this.contractRepository.findAllByDeletedFalse(finalSpec, pageable);
+		Page<Contract> page = this.contractRepository.findAll(finalSpec, pageable);
 		ResultPaginationDTO result = new ResultPaginationDTO();
 		ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
 
@@ -56,14 +65,15 @@ public class ContractServiceImpl implements ContractService {
 	}
 
 	public Contract handleCreateContract(Contract postmanContract) throws IdInvalidException {
-		Contract currContract = findContractById(postmanContract.getId());
-		if (currContract != null) {
+		List<Contract> list = findContractByContractId(postmanContract.getContractId());
+		if (list.isEmpty()) {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " already exists");
 		}
 		postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
 		postmanContract.setDeleted(false);
-		this.actionLogService.handleCreateActionLog(postmanContract, EnumTypeLog.CREATE_CONTRACT);
-		return handleSaveContract(postmanContract);
+		Contract contract = handleSaveContract(postmanContract);
+		this.actionLogService.handleCreateActionLog(contract, EnumTypeLog.CREATE_CONTRACT);
+		return contract;
 	}
 
 	public Contract handleUpdateContract(Contract postmanContract) throws IdInvalidException {
@@ -92,6 +102,14 @@ public class ContractServiceImpl implements ContractService {
 		if (currContract == null) {
 			throw new IdInvalidException("Contract ID = " + id + " doesn't exist!");
 		}
+		currContract.getItems().forEach(item -> {
+			try {
+				this.itemService.handleDelete(item.getId());
+			} catch (IdInvalidException e) {
+
+			}
+		});
+
 		currContract.setDeleted(true);
 		handleSaveContract(currContract);
 		this.actionLogService.handleCreateActionLog(currContract, EnumTypeLog.DELETE_CONTRACT);
