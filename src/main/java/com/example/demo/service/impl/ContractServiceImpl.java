@@ -1,9 +1,18 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.annotation.Lazy;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,7 +28,10 @@ import com.example.demo.service.criteria.ContractSpecs;
 import com.example.demo.util.constant.EnumStatus;
 import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
+import com.example.demo.util.excel.ContractExcelGenerator;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -27,7 +39,7 @@ import lombok.AllArgsConstructor;
 public class ContractServiceImpl implements ContractService {
 	private final ContractRepository contractRepository;
 	private final ActionLogService actionLogService;
-	private final ItemService itemService;
+	private final ItemService itemService;;
 
 	public Contract findContractById(long id) {
 		Optional<Contract> optional = this.contractRepository.findById(id);
@@ -113,5 +125,14 @@ public class ContractServiceImpl implements ContractService {
 		currContract.setDeleted(true);
 		handleSaveContract(currContract);
 		this.actionLogService.handleCreateActionLog(currContract, EnumTypeLog.DELETE_CONTRACT);
+	}
+
+	public void handleExportToExcel(HttpServletResponse response) throws IOException {
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=contracts.xlsx";
+		response.setHeader(headerKey, headerValue);
+		List<Contract> contracts = this.contractRepository.findAll(ContractSpecs.matchDeletedFalse());
+		ContractExcelGenerator generator = new ContractExcelGenerator(contracts);
+		generator.generateExcelFile(response);
 	}
 }

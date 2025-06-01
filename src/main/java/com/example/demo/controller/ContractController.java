@@ -10,8 +10,11 @@ import com.example.demo.util.annotation.ApiMessage;
 import com.example.demo.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
+import java.io.IOException;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -67,6 +70,12 @@ public class ContractController {
 	public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
 		this.contractService.handleDelete(id);
 		return ResponseEntity.ok(null);
+	}
+
+	@GetMapping("/contracts/export-to-excel")
+	public void exportToExcelFile(HttpServletResponse response) throws IOException {
+		this.contractService.handleExportToExcel(response);
+
 	}
 
 }

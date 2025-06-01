@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,8 @@ import org.springframework.data.jpa.domain.Specification;
 import com.example.demo.domain.Contract;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.util.error.IdInvalidException;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface ContractService {
 	public Contract findContractById(long id);
@@ -25,4 +28,6 @@ public interface ContractService {
 	public Contract handleGetContractById(long id) throws IdInvalidException;
 
 	public void handleDelete(long id) throws IdInvalidException;
+
+	public void handleExportToExcel(HttpServletResponse response) throws IOException;
 }

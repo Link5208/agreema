@@ -16,4 +16,5 @@ public interface ContractRepository extends JpaRepository<Contract, Long>, JpaSp
 	Page<Contract> findAll(Specification<Contract> specification, Pageable pageable);
 
 	List<Contract> findByContractId(String contractId);
+
 }

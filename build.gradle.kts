@@ -44,6 +44,10 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("com.turkraft.springfilter:jpa:3.1.9")
+	implementation("org.apache.poi:poi:5.2.5")
+	implementation("org.apache.poi:poi-ooxml:5.2.5")
+	// implementation ("com.fasterxml.jackson.core:jackson-databind:2.18.3")
+	// implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3")
 }
 
 tasks.withType<Test> {

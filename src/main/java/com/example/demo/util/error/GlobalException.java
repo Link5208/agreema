@@ -1,5 +1,6 @@
 package com.example.demo.util.error;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,15 @@ public class GlobalException {
 		response.setMessage(e.getMessage());
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	}
+
+	@ExceptionHandler(value = IOException.class)
+	public ResponseEntity<RestResponse<Object>> handleExportExcelException(Exception e) {
+		RestResponse<Object> res = new RestResponse<Object>();
+		res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		res.setMessage(e.getMessage());
+		res.setError("Export-excel exception occurs ...");
+		return ResponseEntity.badRequest().body(res);
 	}
 
 	@ExceptionHandler(value = StorageException.class)
