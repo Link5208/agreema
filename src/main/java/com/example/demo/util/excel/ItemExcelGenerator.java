@@ -10,23 +10,23 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.example.demo.domain.Contract;
+import com.example.demo.domain.Item;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class ContractExcelGenerator {
-	List<Contract> contracts;
+public class ItemExcelGenerator {
+	List<Item> items;
 	private XSSFWorkbook workbook;
 	private XSSFSheet sheet;
 
-	public ContractExcelGenerator(List<Contract> contracts) {
-		this.contracts = contracts;
+	public ItemExcelGenerator(List<Item> items) {
+		this.items = items;
 		workbook = new XSSFWorkbook();
 	}
 
 	private void writeHeader() {
-		sheet = workbook.createSheet("Contract");
+		sheet = workbook.createSheet("Item");
 		Row row = sheet.createRow(0);
 		CellStyle style = workbook.createCellStyle();
 		XSSFFont font = workbook.createFont();
@@ -34,9 +34,12 @@ public class ContractExcelGenerator {
 		font.setFontHeight(16);
 		style.setFont(font);
 		createCell(row, 0, "ID", style);
-		createCell(row, 1, "Contract Name", style);
-		createCell(row, 2, "Sign date", style);
-		createCell(row, 3, "Status", style);
+		createCell(row, 1, "Item Name", style);
+		createCell(row, 2, "Unit", style);
+		createCell(row, 3, "Quantity", style);
+		createCell(row, 4, "Price", style);
+		createCell(row, 5, "Total", style);
+
 	}
 
 	private void createCell(Row row, int columnCount, Object valueOfCell, CellStyle style) {
@@ -63,13 +66,16 @@ public class ContractExcelGenerator {
 		font.setFontHeight(14);
 		style.setFont(font);
 
-		for (Contract contract : contracts) {
+		for (Item item : items) {
 			Row row = sheet.createRow(rowCount++);
 			int columnCount = 0;
-			createCell(row, columnCount++, contract.getContractId(), style);
-			createCell(row, columnCount++, contract.getName(), style);
-			createCell(row, columnCount++, contract.getSignDate(), style);
-			createCell(row, columnCount++, contract.getStatus(), style);
+			createCell(row, columnCount++, item.getItemId(), style);
+			createCell(row, columnCount++, item.getName(), style);
+			createCell(row, columnCount++, item.getUnit(), style);
+			createCell(row, columnCount++, item.getQuantity(), style);
+			createCell(row, columnCount++, item.getPrice(), style);
+			createCell(row, columnCount++, item.getTotal(), style);
+
 		}
 	}
 

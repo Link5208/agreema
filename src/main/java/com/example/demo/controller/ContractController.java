@@ -73,9 +73,9 @@ public class ContractController {
 	}
 
 	@GetMapping("/contracts/export-to-excel")
-	public void exportToExcelFile(HttpServletResponse response) throws IOException {
+	public ResponseEntity<Void> exportToExcelFile(HttpServletResponse response) throws IOException {
 		this.contractService.handleExportToExcel(response);
-
+		return ResponseEntity.ok(null);
 	}
 
 }

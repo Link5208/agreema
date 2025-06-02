@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import com.example.demo.util.annotation.ApiMessage;
 import com.example.demo.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -64,6 +67,13 @@ public class ItemController {
 	@ApiMessage("Delete an item")
 	public ResponseEntity<Void> deleteItem(@PathVariable("id") long id) throws IdInvalidException {
 		this.itemService.handleDelete(id);
+		return ResponseEntity.ok(null);
+	}
+
+	@GetMapping("/items/export-to-excel/{id}")
+	public ResponseEntity<Void> exportToExcel(@PathVariable("id") long id, HttpServletResponse response)
+			throws IOException {
+		this.itemService.handleExportToExcel(response, id);
 		return ResponseEntity.ok(null);
 	}
 

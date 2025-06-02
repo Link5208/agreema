@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,9 @@ import com.example.demo.service.ItemService;
 import com.example.demo.service.criteria.ItemSpecs;
 import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
+import com.example.demo.util.excel.ItemExcelGenerator;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -128,5 +131,14 @@ public class ItemServiceImpl implements ItemService {
 			throw new IdInvalidException("Item ID = " + id + " doesn't exist!");
 		}
 		return currItem;
+	}
+
+	public void handleExportToExcel(HttpServletResponse response, long id) throws IOException {
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=items.xlsx";
+		response.setHeader(headerKey, headerValue);
+		List<Item> items = this.contractRepository.findById(id).get().getItems();
+		ItemExcelGenerator generator = new ItemExcelGenerator(items);
+		generator.generateExcelFile(response);
 	}
 }
