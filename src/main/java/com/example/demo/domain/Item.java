@@ -16,12 +16,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "Items")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Item {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +46,32 @@ public class Item {
 
 	private double total;
 	private boolean deleted;
+
+	/**
+	 * @param itemId
+	 * @param name
+	 * @param unit
+	 * @param quantity
+	 * @param price
+	 * @param total
+	 * @param deleted
+	 * @param contract
+	 */
+	public Item(@NotBlank(message = "Item-id must not blank!") String itemId,
+			@NotBlank(message = "Item-name must not blank!") String name,
+			@NotBlank(message = "Unit must not blank!") String unit,
+			@NotNull(message = "Quantity must not blank!") long quantity,
+			@NotNull(message = "Unit price must not blank!") double price, double total, boolean deleted,
+			@NotNull(message = "Contract_id must not blank!") Contract contract) {
+		this.itemId = itemId;
+		this.name = name;
+		this.unit = unit;
+		this.quantity = quantity;
+		this.price = price;
+		this.total = total;
+		this.deleted = deleted;
+		this.contract = contract;
+	}
 
 	@ManyToOne
 	@JoinColumn(name = "contract_id")

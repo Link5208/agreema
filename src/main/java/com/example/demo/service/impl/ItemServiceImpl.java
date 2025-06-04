@@ -80,21 +80,18 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	public Item handleCreateItem(Item postmanItem) throws IdInvalidException {
-		List<Item> items = fetchByItemId(postmanItem.getItemId());
-		if (items.isEmpty()) {
+		if (this.itemRepository.existsByItemIdAndDeletedFalse(postmanItem.getItemId())) {
 			throw new IdInvalidException("Item ID = " + postmanItem.getItemId() + " already exists");
 		}
 
 		postmanItem.setTotal(postmanItem.getQuantity() * postmanItem.getPrice());
 		postmanItem.setDeleted(false);
-
-		List<Contract> contracts = this.contractRepository.findByContractId(postmanItem.getContract().getContractId());
-		List<Contract> list = contracts.stream().filter(contract -> !contract.isDeleted()).toList();
-		if (list.isEmpty()) {
-			throw new IdInvalidException("Contract ID = " + postmanItem.getContract().getContractId() + " doesn't exist!");
+		Contract contract = this.contractRepository.findById(postmanItem.getContract().getId()).orElse(null);
+		if (contract == null) {
+			throw new IdInvalidException("Contract ID = " + postmanItem.getContract().getId() + " doesn't exist!");
 		}
+		postmanItem.setContract(contract);
 
-		postmanItem.setContract(list.get(0));
 		this.actionLogService.handleCreateActionLog(postmanItem.getContract(), EnumTypeLog.CHANGE_CONTRACT);
 
 		return handleSaveItem(postmanItem);

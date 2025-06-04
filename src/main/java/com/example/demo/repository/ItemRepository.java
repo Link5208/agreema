@@ -16,4 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
 	Page<Item> findAll(Specification<Item> specification, Pageable pageable);
 
 	List<Item> findByItemId(String itemId);
+
+	boolean existsByItemIdAndDeletedFalse(String itemId);
+
 }

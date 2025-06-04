@@ -1,22 +1,14 @@
 package com.example.demo.service.impl;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.domain.Contract;
 import com.example.demo.domain.response.ResultPaginationDTO;
@@ -30,7 +22,6 @@ import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
 import com.example.demo.util.excel.ContractExcelGenerator;
 
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -76,14 +67,22 @@ public class ContractServiceImpl implements ContractService {
 		return result;
 	}
 
+	@Transactional(rollbackFor = IdInvalidException.class)
 	public Contract handleCreateContract(Contract postmanContract) throws IdInvalidException {
-		List<Contract> list = findContractByContractId(postmanContract.getContractId());
-		if (list.isEmpty()) {
+
+		if (this.contractRepository.existsByContractIdAndDeletedFalse(postmanContract.getContractId())) {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " already exists");
 		}
 		postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
 		postmanContract.setDeleted(false);
 		Contract contract = handleSaveContract(postmanContract);
+
+		if (postmanContract.getItems() != null && !postmanContract.getItems().isEmpty()) {
+			postmanContract.getItems().forEach(item -> {
+				item.setContract(contract);
+				itemService.handleSaveItem(item);
+			});
+		}
 		this.actionLogService.handleCreateActionLog(contract, EnumTypeLog.CREATE_CONTRACT);
 		return contract;
 	}

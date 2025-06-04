@@ -20,12 +20,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "contracts")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Contract {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +50,23 @@ public class Contract {
 	private Instant updatedAt;
 	private String createdBy;
 	private String updatedBy;
+
+	/**
+	 * @param contractId
+	 * @param name
+	 * @param signDate
+	 * @param status
+	 * @param deleted
+	 */
+	public Contract(@NotBlank(message = "Contract-id must not blank!") String contractId,
+			@NotBlank(message = "Contract-name must not blank!") String name,
+			@NotNull(message = "Sign date must not be null!") Instant signDate, EnumStatus status, boolean deleted) {
+		this.contractId = contractId;
+		this.name = name;
+		this.signDate = signDate;
+		this.status = status;
+		this.deleted = deleted;
+	}
 
 	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
 	@JsonIgnore
