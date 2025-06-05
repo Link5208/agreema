@@ -76,6 +76,10 @@ public class Contract {
 	@JsonIgnore
 	private List<ActionLog> actionLogs;
 
+	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<File> files;
+
 	@PrePersist
 	public void handleBeforeCreate() {
 		this.createdAt = Instant.now();
