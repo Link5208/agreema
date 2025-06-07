@@ -72,11 +72,9 @@ public class Contract {
 	private List<Item> items;
 
 	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
-	@JsonIgnore
 	private List<ActionLog> actionLogs;
 
 	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
-	@JsonIgnore
 	private List<FileInfo> files;
 
 	@PrePersist
