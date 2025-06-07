@@ -80,6 +80,7 @@ public class ContractServiceImpl implements ContractService {
 		if (postmanContract.getItems() != null && !postmanContract.getItems().isEmpty()) {
 			postmanContract.getItems().forEach(item -> {
 				item.setContract(contract);
+				item.setTotal(item.getPrice() * item.getQuantity());
 				itemService.handleSaveItem(item);
 			});
 		}

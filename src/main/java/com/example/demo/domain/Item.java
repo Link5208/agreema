@@ -3,6 +3,7 @@ package com.example.demo.domain;
 import java.time.Instant;
 
 import com.example.demo.util.SecurityUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -76,6 +77,7 @@ public class Item {
 	@ManyToOne
 	@JoinColumn(name = "contract_id")
 	@NotNull(message = "Contract_id must not blank!")
+	@JsonIgnore
 	private Contract contract;
 
 	private Instant createdAt;

@@ -35,7 +35,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.16.Final")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 	runtimeOnly("com.mysql:mysql-connector-j")
@@ -46,6 +45,7 @@ dependencies {
 	implementation("com.turkraft.springfilter:jpa:3.1.9")
 	implementation("org.apache.poi:poi:5.2.5")
 	implementation("org.apache.poi:poi-ooxml:5.2.5")
+	annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.16.Final")
 	// implementation ("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 	// implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3")
 }

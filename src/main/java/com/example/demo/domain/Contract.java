@@ -69,7 +69,6 @@ public class Contract {
 	}
 
 	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
-	@JsonIgnore
 	private List<Item> items;
 
 	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
@@ -78,7 +77,7 @@ public class Contract {
 
 	@OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<File> files;
+	private List<FileInfo> files;
 
 	@PrePersist
 	public void handleBeforeCreate() {
