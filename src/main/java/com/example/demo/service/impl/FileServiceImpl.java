@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -116,7 +118,8 @@ public class FileServiceImpl implements FileService {
 		if (file == null || file.isEmpty()) {
 			throw new StorageException("File is empty. Please upload a file");
 		}
-		String fileName = file.getOriginalFilename();
+		String fileName = file.getOriginalFilename().replace("%20", " ");
+
 		postmanFileInfo.setName(fileName);
 
 		List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx");
