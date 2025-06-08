@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,6 +85,7 @@ public class ContractServiceImpl implements ContractService {
 				itemService.handleSaveItem(item);
 			});
 		}
+
 		this.actionLogService.handleCreateActionLog(contract, EnumTypeLog.CREATE_CONTRACT);
 		return contract;
 	}
@@ -134,5 +136,21 @@ public class ContractServiceImpl implements ContractService {
 		List<Contract> contracts = this.contractRepository.findAll(ContractSpecs.matchDeletedFalse());
 		ContractExcelGenerator generator = new ContractExcelGenerator(contracts);
 		generator.generateExcelFile(response);
+	}
+
+	@Transactional
+	public void handleAutoLiquidation(Instant liquidationDate) {
+		List<Contract> contracts = contractRepository.findByStatusAndSignDateBeforeAndDeletedFalse(
+				EnumStatus.UNLIQUIDATED,
+				liquidationDate);
+
+		for (Contract contract : contracts) {
+			contract.setStatus(EnumStatus.LIQUIDATED);
+			handleSaveContract(contract);
+			this.actionLogService.handleCreateActionLog(
+					contract,
+					EnumTypeLog.AUTO_LIQUIDATE_CONTRACT);
+
+		}
 	}
 }

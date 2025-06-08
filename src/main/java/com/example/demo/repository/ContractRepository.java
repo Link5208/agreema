@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.domain.Contract;
+import com.example.demo.util.constant.EnumStatus;
 
 @Repository
 public interface ContractRepository extends JpaRepository<Contract, Long>, JpaSpecificationExecutor<Contract> {
@@ -21,5 +23,9 @@ public interface ContractRepository extends JpaRepository<Contract, Long>, JpaSp
 	boolean existsByContractIdAndDeletedFalse(String contractId);
 
 	Optional<Contract> findByContractIdAndDeletedFalse(String contractId);
+
+	List<Contract> findByStatusAndSignDateBeforeAndDeletedFalse(
+			EnumStatus status,
+			Instant liquidationDate);
 
 }

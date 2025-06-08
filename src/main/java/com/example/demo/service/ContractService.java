@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -30,4 +31,6 @@ public interface ContractService {
 	public void handleDelete(long id) throws IdInvalidException;
 
 	public void handleExportToExcel(HttpServletResponse response) throws IOException;
+
+	public void handleAutoLiquidation(Instant liquidationDate);
 }
