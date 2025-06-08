@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -10,17 +11,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.domain.Contract;
+import com.example.demo.domain.FileInfo;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ContractRepository;
 import com.example.demo.service.ActionLogService;
 import com.example.demo.service.ContractService;
+import com.example.demo.service.FileService;
 import com.example.demo.service.ItemService;
 import com.example.demo.service.criteria.ContractSpecs;
 import com.example.demo.util.constant.EnumStatus;
 import com.example.demo.util.constant.EnumTypeLog;
 import com.example.demo.util.error.IdInvalidException;
+import com.example.demo.util.error.StorageException;
 import com.example.demo.util.excel.ContractExcelGenerator;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +36,8 @@ import lombok.AllArgsConstructor;
 public class ContractServiceImpl implements ContractService {
 	private final ContractRepository contractRepository;
 	private final ActionLogService actionLogService;
-	private final ItemService itemService;;
+	private final ItemService itemService;
+	private final FileService fileService;
 
 	public Contract findContractById(long id) {
 		Optional<Contract> optional = this.contractRepository.findById(id);
@@ -68,8 +74,9 @@ public class ContractServiceImpl implements ContractService {
 		return result;
 	}
 
-	@Transactional(rollbackFor = IdInvalidException.class)
-	public Contract handleCreateContract(Contract postmanContract) throws IdInvalidException {
+	@Transactional(rollbackFor = Exception.class)
+	public Contract handleCreateContract(Contract postmanContract, List<MultipartFile> files)
+			throws IdInvalidException, StorageException, URISyntaxException, IOException {
 
 		if (this.contractRepository.existsByContractIdAndDeletedFalse(postmanContract.getContractId())) {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " already exists");
@@ -84,6 +91,17 @@ public class ContractServiceImpl implements ContractService {
 				item.setTotal(item.getPrice() * item.getQuantity());
 				itemService.handleSaveItem(item);
 			});
+		}
+
+		// Handle files
+		if (files != null && !files.isEmpty()) {
+			for (MultipartFile file : files) {
+				FileInfo fileInfo = new FileInfo();
+				fileInfo.setFileId(contract.getContractId() + "-" + System.currentTimeMillis());
+				fileInfo.setContract(contract);
+
+				fileService.handleUpload(file, fileInfo);
+			}
 		}
 
 		this.actionLogService.handleCreateActionLog(contract, EnumTypeLog.CREATE_CONTRACT);

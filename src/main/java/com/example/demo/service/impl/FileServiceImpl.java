@@ -119,7 +119,7 @@ public class FileServiceImpl implements FileService {
 		String fileName = file.getOriginalFilename();
 		postmanFileInfo.setName(fileName);
 
-		List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc");
+		List<String> allowedExtensions = Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx");
 		boolean isValid = allowedExtensions.stream().anyMatch(extension -> fileName.toLowerCase().endsWith(extension));
 		if (!isValid) {
 			throw new StorageException("Invalid file extension. Only allow " + allowedExtensions.toString());
