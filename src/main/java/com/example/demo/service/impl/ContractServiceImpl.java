@@ -159,14 +159,18 @@ public class ContractServiceImpl implements ContractService {
 	}
 
 	@Transactional
-	public void handleAutoLiquidation(Instant liquidationDate) {
-		List<Contract> contracts = contractRepository.findByStatusAndSignDateBeforeAndDeletedFalse(
-				EnumStatus.UNLIQUIDATED,
-				liquidationDate);
+	public void handleAutoLiquidation(Instant currentTime) {
+		// Find contracts where liquidationDate <= currentTime and status is
+		// UNLIQUIDATED
+		List<Contract> contracts = contractRepository.findByLiquidationDateLessThanEqualAndStatusAndDeletedFalse(
+				currentTime,
+				EnumStatus.UNLIQUIDATED);
 
 		for (Contract contract : contracts) {
 			contract.setStatus(EnumStatus.LIQUIDATED);
 			handleSaveContract(contract);
+
+			// Log the auto-liquidation action
 			this.actionLogService.handleCreateActionLog(
 					contract,
 					EnumTypeLog.AUTO_LIQUIDATE_CONTRACT);

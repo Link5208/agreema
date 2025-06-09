@@ -24,8 +24,8 @@ public interface ContractRepository extends JpaRepository<Contract, Long>, JpaSp
 
 	Optional<Contract> findByContractIdAndDeletedFalse(String contractId);
 
-	List<Contract> findByStatusAndSignDateBeforeAndDeletedFalse(
-			EnumStatus status,
-			Instant liquidationDate);
+	List<Contract> findByLiquidationDateLessThanEqualAndStatusAndDeletedFalse(
+			Instant liquidationDate,
+			EnumStatus status);
 
 }

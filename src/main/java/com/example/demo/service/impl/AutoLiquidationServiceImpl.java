@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 import com.example.demo.service.ContractService;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Service
 @Slf4j
@@ -17,24 +15,20 @@ public class AutoLiquidationServiceImpl {
 
 	private final ContractService contractService;
 
-	/**
-	 * @param contractService
-	 */
 	public AutoLiquidationServiceImpl(ContractService contractService) {
 		this.contractService = contractService;
 	}
-
-	@Value("${contract.auto-liquidation.days:365}")
-	private long daysUntilLiquidation;
 
 	@Scheduled(cron = "${contract.auto-liquidation.cron}")
 	public void autoLiquidateContracts() {
 		log.info("Starting auto liquidation check...");
 
 		try {
-			Instant liquidationDate = Instant.now().minus(daysUntilLiquidation, ChronoUnit.DAYS);
+			// Get current time
+			Instant now = Instant.now();
 
-			contractService.handleAutoLiquidation(liquidationDate);
+			// Auto liquidate contracts where liquidationDate has passed
+			contractService.handleAutoLiquidation(now);
 
 			log.info("Auto liquidation completed successfully");
 		} catch (Exception e) {
