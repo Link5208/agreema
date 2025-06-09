@@ -46,8 +46,6 @@ dependencies {
 	implementation("org.apache.poi:poi:5.2.5")
 	implementation("org.apache.poi:poi-ooxml:5.2.5")
 	annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.16.Final")
-	// implementation ("com.fasterxml.jackson.core:jackson-databind:2.18.3")
-	// implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3")
 }
 
 tasks.withType<Test> {

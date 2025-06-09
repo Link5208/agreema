@@ -28,4 +28,6 @@ public interface ContractRepository extends JpaRepository<Contract, Long>, JpaSp
 			Instant liquidationDate,
 			EnumStatus status);
 
+	List<Contract> findByLiquidationDateEqualsAndStatusAndDeletedFalse(Instant liquidationDate, EnumStatus unliquidated);
+
 }

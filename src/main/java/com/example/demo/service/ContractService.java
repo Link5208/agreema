@@ -36,5 +36,7 @@ public interface ContractService {
 
 	public void handleExportToExcel(HttpServletResponse response) throws IOException;
 
-	public void handleAutoLiquidation(Instant liquidationDate);
+	public List<Contract> handleAutoLiquidation(Instant liquidationDate);
+
+	public List<Contract> findContractsToLiquidateAt(Instant liquidationDate);
 }

@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +20,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.domain.Contract;
@@ -35,8 +33,7 @@ import com.example.demo.service.criteria.FileSpecs;
 import com.example.demo.util.error.IdInvalidException;
 import com.example.demo.util.error.StorageException;
 
-@Repository
-
+@Service
 public class FileServiceImpl implements FileService {
 	private final FileRepository fileRepository;
 	private final ContractRepository contractRepository;

@@ -9,7 +9,6 @@ import org.springframework.data.jpa.domain.Specification;
 import com.example.demo.domain.Item;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.util.error.IdInvalidException;
-
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface ItemService {
