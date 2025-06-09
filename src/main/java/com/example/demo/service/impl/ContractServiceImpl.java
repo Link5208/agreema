@@ -81,7 +81,9 @@ public class ContractServiceImpl implements ContractService {
 		if (this.contractRepository.existsByContractIdAndDeletedFalse(postmanContract.getContractId())) {
 			throw new IdInvalidException("Contract ID = " + postmanContract.getId() + " already exists");
 		}
-		postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
+		if (postmanContract.getStatus() == null) {
+			postmanContract.setStatus(EnumStatus.UNLIQUIDATED);
+		}
 		postmanContract.setDeleted(false);
 		Contract contract = handleSaveContract(postmanContract);
 

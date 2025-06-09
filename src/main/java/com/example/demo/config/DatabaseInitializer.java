@@ -1,8 +1,10 @@
 package com.example.demo.config;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.boot.CommandLineRunner;
@@ -43,11 +45,14 @@ public class DatabaseInitializer implements CommandLineRunner {
 		}
 
 		if (countContracts == 0) {
-			String dateTimeString = "2024-01-10 09:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString, formatter);
-			Instant instant = localDateTime.atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toInstant();
-			Contract contract = new Contract("HD001", "Hợp đồng cung cấp thiết bị văn phòng", instant,
+			String dateString = "2024-01-10";
+			String dateString2 = "2025-01-10";
+			LocalDate localDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
+			LocalDate localDate2 = LocalDate.parse(dateString2, DateTimeFormatter.ISO_DATE);
+			// Chuyển LocalDate thành Instant ở UTC
+			Instant instant = localDate.atStartOfDay().toInstant(ZoneOffset.UTC);
+			Instant instant2 = localDate2.atStartOfDay().toInstant(ZoneOffset.UTC);
+			Contract contract = new Contract("HD001", "Hợp đồng cung cấp thiết bị văn phòng", instant, instant2,
 					EnumStatus.UNLIQUIDATED, false);
 			contract = this.contractRepository.save(contract);
 

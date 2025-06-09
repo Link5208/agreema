@@ -2,3 +2,10 @@
 2. service là interface, serviceImpl implements Service
 3. Chỉnh lại SpringFilter
 4. Sửa message cho exception
+
+5. Sửa total, các status
+6. Sửa Search Data
+7. Sửa sort bằng Be
+8. Sửa default số lượng contract thành 5
+9. Xóa bớt các thứ thừa trên template
+10. Thêm trang register 

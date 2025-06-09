@@ -40,8 +40,12 @@ public class Contract {
 	private String name;
 
 	@NotNull(message = "Sign date must not be null!")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	private Instant signDate;
+
+	@NotNull(message = "Liquidation Date must not be null!")
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	private Instant liquidationDate;
 
 	private EnumStatus status;
 	private boolean deleted;
@@ -55,15 +59,19 @@ public class Contract {
 	 * @param contractId
 	 * @param name
 	 * @param signDate
+	 * @param liquidationDate
 	 * @param status
 	 * @param deleted
 	 */
 	public Contract(@NotBlank(message = "Contract-id must not blank!") String contractId,
 			@NotBlank(message = "Contract-name must not blank!") String name,
-			@NotNull(message = "Sign date must not be null!") Instant signDate, EnumStatus status, boolean deleted) {
+			@NotNull(message = "Sign date must not be null!") Instant signDate,
+			@NotNull(message = "Liquidation Date must not be null!") Instant liquidationDate, EnumStatus status,
+			boolean deleted) {
 		this.contractId = contractId;
 		this.name = name;
 		this.signDate = signDate;
+		this.liquidationDate = liquidationDate;
 		this.status = status;
 		this.deleted = deleted;
 	}

@@ -6,30 +6,25 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.time.ZoneId;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.time.format.DateTimeFormatter;
-import java.util.TimeZone;
 
 @Configuration
 public class DateTimeFormatConfiguration implements WebMvcConfigurer {
 
-	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	private static final ZoneId ZONE_ID = ZoneId.of("Asia/Ho_Chi_Minh");
-
 	@Bean
 	public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
 		return builder -> {
-			builder.timeZone(TimeZone.getTimeZone(ZONE_ID));
-			builder.simpleDateFormat(DATE_TIME_FORMAT);
+			// Use ISO format for dates
+			builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		};
 	}
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
 		DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
-		registrar.setDateTimeFormatter(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)
-				.withZone(ZONE_ID));
+		// Use ISO_DATE format
+		registrar.setDateFormatter(DateTimeFormatter.ISO_DATE);
 		registrar.registerFormatters(registry);
 	}
 }
