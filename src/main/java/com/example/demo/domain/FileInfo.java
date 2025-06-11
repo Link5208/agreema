@@ -38,6 +38,7 @@ public class FileInfo {
 	private long size;
 
 	private String path;
+	private String checksum;
 
 	private boolean deleted;
 

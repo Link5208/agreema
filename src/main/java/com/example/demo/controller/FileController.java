@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -7,9 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,6 +71,31 @@ public class FileController {
 	public ResponseEntity<ResultPaginationDTO> getAllFiles(@Filter Specification<FileInfo> specification,
 			Pageable pageable) {
 		return ResponseEntity.ok(this.fileService.handleFetchAllFiles(specification, pageable));
+	}
+
+	@GetMapping("/files/{id}/download")
+	@ApiMessage("Download a file")
+	public ResponseEntity<InputStreamResource> downloadFile(@PathVariable("id") long id)
+			throws URISyntaxException, StorageException, IdInvalidException {
+
+		// Get file info
+		FileInfo fileInfo = fileService.findById(id);
+
+		// Get file resource
+		InputStreamResource resource = fileService.getResource(id);
+
+		// Set headers
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileInfo.getName());
+		headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+		headers.add(HttpHeaders.PRAGMA, "no-cache");
+		headers.add(HttpHeaders.EXPIRES, "0");
+
+		// Return response
+		return ResponseEntity.ok()
+				.headers(headers)
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(resource);
 	}
 
 }

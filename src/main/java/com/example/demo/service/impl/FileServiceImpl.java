@@ -1,19 +1,22 @@
 package com.example.demo.service.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -25,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.domain.Contract;
 import com.example.demo.domain.FileInfo;
+import com.example.demo.domain.dto.FileStoreResult;
 import com.example.demo.domain.response.ResultPaginationDTO;
 import com.example.demo.repository.ContractRepository;
 import com.example.demo.repository.FileRepository;
@@ -50,6 +54,22 @@ public class FileServiceImpl implements FileService {
 	@Value("${hoanglong.upload-file.base-uri}")
 	private String baseURI;
 
+	@Value("${file.encryption.secret-key}")
+	private String encryptionKey;
+
+	private SecretKey generateKey() throws Exception {
+		byte[] keyBytes = new byte[32];
+		byte[] decodedKey = Base64.getDecoder().decode(encryptionKey);
+
+		if (decodedKey.length != 32) {
+			throw new StorageException("AES key must be 32 bytes (decoded from Base64). Found: " + decodedKey.length);
+		}
+
+		System.arraycopy(decodedKey, 0, keyBytes, 0, 32);
+
+		return new SecretKeySpec(keyBytes, "AES");
+	}
+
 	public void createDirectory(String folder) throws URISyntaxException {
 		URI uri = new URI(folder);
 		Path path = Paths.get(uri);
@@ -68,14 +88,19 @@ public class FileServiceImpl implements FileService {
 
 	}
 
-	public String store(MultipartFile file) throws URISyntaxException, IOException {
+	public FileStoreResult store(MultipartFile file) throws URISyntaxException, IOException, StorageException {
 		String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
 		URI uri = new URI(baseURI + "/" + finalName);
 		Path path = Paths.get(uri);
-		try (InputStream inputStream = file.getInputStream()) {
-			Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+		try {
+			// Encrypt file content
+			byte[] encryptedContent = encryptLargeFile(file.getBytes());
+			String checksum = calculateChecksum(encryptedContent);
+			Files.write(path, encryptedContent);
+			return new FileStoreResult(finalName, checksum);
+		} catch (Exception e) {
+			throw new StorageException(e.getMessage());
 		}
-		return finalName;
 	}
 
 	public long getFileLength(String fileName) throws URISyntaxException {
@@ -89,14 +114,37 @@ public class FileServiceImpl implements FileService {
 		return file.length();
 	}
 
-	public InputStreamResource getResource(String fileName)
-			throws URISyntaxException, FileNotFoundException {
+	public InputStreamResource getResource(long id)
+			throws StorageException, URISyntaxException {
 		// TODO Auto-generated method stub
+		FileInfo file = this.fileRepository.findById(id)
+				.orElseThrow(() -> new StorageException("File not found with ID: " + id));
+
+		if (file.isDeleted()) {
+			throw new StorageException("File has been deleted");
+		}
+
+		String fileName = file.getPath();
 		URI uri = new URI(baseURI + "/" + fileName);
 		Path path = Paths.get(uri);
 
-		File file = new File(path.toString());
-		return new InputStreamResource(new FileInputStream(file));
+		if (!Files.exists(path)) {
+			throw new StorageException("Physical file not found at: " + path);
+		}
+
+		try {
+			byte[] encryptedContent = Files.readAllBytes(path);
+			String currentChecksum = calculateChecksum(encryptedContent);
+			if (!currentChecksum.equals(file.getChecksum())) {
+				throw new StorageException("File integrity check failed");
+			}
+			byte[] decryptedContent = decryptFile(encryptedContent);
+			return new InputStreamResource(new ByteArrayInputStream(decryptedContent));
+		} catch (NoSuchAlgorithmException e) {
+			throw new StorageException("Failed to calculate checksum");
+		} catch (Exception e) {
+			throw new StorageException(e.getMessage());
+		}
 	}
 
 	public FileInfo handleUpload(MultipartFile file, FileInfo postmanFileInfo)
@@ -132,13 +180,21 @@ public class FileServiceImpl implements FileService {
 		postmanFileInfo.setType(tail);
 
 		createDirectory(baseURI);
-		String uploadFile = store(file);
-		postmanFileInfo.setSize(getFileLength(uploadFile));
+		FileStoreResult result = store(file);
+
+		postmanFileInfo.setSize(getFileLength(result.getFileName()));
 		postmanFileInfo.setDeleted(false);
-		postmanFileInfo.setPath("/upload/" + uploadFile);
+		postmanFileInfo.setPath(result.getFileName());
+		postmanFileInfo.setChecksum(result.getChecksum());
 
 		return this.fileRepository.save(postmanFileInfo);
 
+	}
+
+	private String calculateChecksum(byte[] content) throws NoSuchAlgorithmException {
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		byte[] hash = digest.digest(content);
+		return Base64.getEncoder().encodeToString(hash);
 	}
 
 	public void handleDelete(long id) throws IdInvalidException {
@@ -169,6 +225,83 @@ public class FileServiceImpl implements FileService {
 		result.setResult(page.getContent());
 
 		return result;
+	}
+
+	public FileInfo findById(long id) throws IdInvalidException, StorageException {
+		FileInfo fileInfo = this.fileRepository.findById(id)
+				.orElseThrow(() -> new IdInvalidException("File ID = " + id + " doesn't exist!"));
+
+		if (fileInfo.isDeleted()) {
+			throw new StorageException("File has been deleted");
+		}
+		return fileInfo;
+
+	}
+
+	private byte[] encryptLargeFile(byte[] fileContent) throws Exception {
+		SecretKey key = generateKey();
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.ENCRYPT_MODE, key);
+
+		int chunkSize = 16 * 1024 * 1024;
+		int inputPos = 0;
+		int outputPos = 0;
+
+		byte[] result = new byte[fileContent.length + 32]; // dư buffer padding
+
+		while (inputPos < fileContent.length) {
+			int length = Math.min(chunkSize, fileContent.length - inputPos);
+			byte[] chunk = Arrays.copyOfRange(fileContent, inputPos, inputPos + length);
+			byte[] encryptedChunk = cipher.update(chunk);
+
+			if (encryptedChunk != null) {
+				System.arraycopy(encryptedChunk, 0, result, outputPos, encryptedChunk.length);
+				outputPos += encryptedChunk.length;
+			}
+
+			inputPos += length;
+		}
+
+		byte[] finalBlock = cipher.doFinal();
+		if (finalBlock != null) {
+			System.arraycopy(finalBlock, 0, result, outputPos, finalBlock.length);
+			outputPos += finalBlock.length;
+		}
+
+		return Arrays.copyOf(result, outputPos); // cắt đúng độ dài
+	}
+
+	private byte[] decryptFile(byte[] encryptedData) throws Exception {
+		SecretKey key = generateKey();
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.DECRYPT_MODE, key);
+
+		int chunkSize = 16 * 1024 * 1024;
+		int inputPos = 0;
+		int outputPos = 0;
+
+		byte[] result = new byte[encryptedData.length + 32];
+
+		while (inputPos < encryptedData.length) {
+			int length = Math.min(chunkSize, encryptedData.length - inputPos);
+			byte[] chunk = Arrays.copyOfRange(encryptedData, inputPos, inputPos + length);
+			byte[] decryptedChunk = cipher.update(chunk);
+
+			if (decryptedChunk != null) {
+				System.arraycopy(decryptedChunk, 0, result, outputPos, decryptedChunk.length);
+				outputPos += decryptedChunk.length;
+			}
+
+			inputPos += length;
+		}
+
+		byte[] finalBlock = cipher.doFinal();
+		if (finalBlock != null) {
+			System.arraycopy(finalBlock, 0, result, outputPos, finalBlock.length);
+			outputPos += finalBlock.length;
+		}
+
+		return Arrays.copyOf(result, outputPos); // ⚠ Trả về đúng độ dài
 	}
 
 }
